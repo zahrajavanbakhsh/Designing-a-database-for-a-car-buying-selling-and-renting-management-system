@@ -2,7 +2,10 @@ USE CarManagement_Final;
 GO
 
 -- functions
+
 -- final rental cost 
+DROP FUNCTION IF EXISTS fn_CalculateRentalCost;
+GO
 CREATE FUNCTION fn_CalculateRentalCost 
 (
     @CarID INT,
@@ -22,6 +25,8 @@ END;
 GO
 
 -- availablity cars for triggers and procejures
+DROP FUNCTION IF EXISTS fn_CheckCarAvailability;
+GO
 CREATE FUNCTION fn_CheckCarAvailability 
 (
     @CarID INT,
@@ -48,6 +53,8 @@ END;
 GO
 
 -- all reservation of a customer for discount
+DROP FUNCTION IF EXISTS fn_GetCustomerTotalReservations;
+GO
 CREATE FUNCTION fn_GetCustomerTotalReservations 
 (
     @CustomerID INT
@@ -66,6 +73,8 @@ END;
 GO
 
 -- correction of searching for a car
+DROP FUNCTION IF EXISTS fn_AdvancedCarSearch;
+GO
 CREATE FUNCTION fn_AdvancedCarSearch 
 (
     @BrandName NVARCHAR(100) = NULL,
@@ -82,6 +91,7 @@ RETURN
         m.Name AS Brand,
         c.Model,
         c.BuildYear,
+        c.CarAge, 
         c.Mileage,
         c.DailyRentPrice,
         c.BaseSalePrice,
@@ -98,6 +108,8 @@ RETURN
 GO
 
 -- correction of the state of a car for customer
+DROP FUNCTION IF EXISTS fn_GetCarConditionReport;
+GO
 CREATE FUNCTION fn_GetCarConditionReport 
 (
     @CarID INT
@@ -110,6 +122,7 @@ RETURN
         c.VIN, 
         c.Model, 
         c.BuildYear, 
+        c.CarAge, 
         c.Mileage AS CurrentMileage,
         c.CurrentStatus,
         r.RepairDate, 

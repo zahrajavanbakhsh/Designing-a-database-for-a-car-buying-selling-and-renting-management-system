@@ -3,6 +3,8 @@ GO
 
 -- views
 -- available cars for employees and costumers
+DROP VIEW IF EXISTS vw_AvailableCars;
+GO
 CREATE VIEW vw_AvailableCars AS
 SELECT 
     c.CarID, 
@@ -10,6 +12,7 @@ SELECT
     m.Name AS Brand, 
     c.Model, 
     c.BuildYear, 
+    c.CarAge, 
     c.DailyRentPrice, 
     c.BaseSalePrice
 FROM Car c
@@ -18,6 +21,8 @@ WHERE c.CurrentStatus = 'Available';
 GO
 
 -- ROI for manager
+DROP VIEW IF EXISTS vw_CarROI_Analysis;
+GO
 CREATE VIEW vw_CarROI_Analysis AS
 SELECT 
     c.CarID,
@@ -31,10 +36,12 @@ FROM Car c;
 GO
 
 -- good customers for manager
+DROP VIEW IF EXISTS vw_CustomerFinancialStatus;
+GO
 CREATE VIEW vw_CustomerFinancialStatus AS
 SELECT 
     CustomerID,
-    FirstName + ' ' + LastName AS FullName,
+    FullName, 
     NationalCode,
     WalletBalance,
     AccountStatus
@@ -42,10 +49,12 @@ FROM Customer;
 GO
 
 -- classification of customers
+DROP VIEW IF EXISTS vw_CustomerRanking;
+GO
 CREATE VIEW vw_CustomerRanking AS
 SELECT 
     CustomerID,
-    FirstName + ' ' + LastName AS FullName,
+    FullName, 
     WalletBalance,
     CASE 
         WHEN WalletBalance >= 1000 THEN 'VIP Customer'
@@ -57,6 +66,8 @@ FROM Customer;
 GO
 
 -- total of a payment for each brand
+DROP VIEW IF EXISTS vw_IncomeReportByBrand;
+GO
 CREATE VIEW vw_IncomeReportByBrand AS
 SELECT 
     ISNULL(m.Name, '--- Grand Total ---') AS BrandName,
@@ -70,10 +81,12 @@ GROUP BY ROLLUP(m.Name);
 GO
 
 -- commission of each employee
+DROP VIEW IF EXISTS vw_EmployeeCommissionReport;
+GO
 CREATE VIEW vw_EmployeeCommissionReport AS
 SELECT 
     e.EmployeeID,
-    e.FirstName + ' ' + e.LastName AS FullName,
+    e.FullName, 
     e.Position,
     COUNT(s.SaleID) AS TotalSalesContracts,
     ISNULL(SUM(s.FinalPrice), 0) AS TotalSalesVolume,
@@ -82,13 +95,14 @@ FROM Employee e
 LEFT JOIN Sale s ON e.EmployeeID = s.EmployeeID
 GROUP BY 
     e.EmployeeID, 
-    e.FirstName, 
-    e.LastName, 
+    e.FullName, 
     e.Position, 
     e.CommissionRate;
 GO
 
 -- Sales Revenue by Brand and Payment Method
+DROP VIEW IF EXISTS vw_Pivot_Sales_By_PaymentMethod;
+GO
 CREATE VIEW vw_Pivot_Sales_By_PaymentMethod AS
 SELECT * FROM (
     SELECT 
@@ -107,6 +121,8 @@ PIVOT (
 GO
 
 -- Comprehensive Sales Analysis by Brand and Year
+DROP VIEW IF EXISTS vw_Cube_RevenueAnalysis;
+GO
 CREATE VIEW vw_Cube_RevenueAnalysis AS
 SELECT 
     ISNULL(m.Name, '--- All Brands ---') AS Brand,
@@ -119,8 +135,10 @@ GROUP BY CUBE(m.Name, c.BuildYear);
 GO
 
 -- Find customers who only rent, but never buy
+DROP VIEW IF EXISTS vw_RentOnlyCustomers;
+GO
 CREATE VIEW vw_RentOnlyCustomers AS
-SELECT CustomerID, FirstName, LastName, NationalCode 
+SELECT CustomerID, FullName, NationalCode 
 FROM Customer
 WHERE CustomerID IN (
     SELECT CustomerID FROM Reservation

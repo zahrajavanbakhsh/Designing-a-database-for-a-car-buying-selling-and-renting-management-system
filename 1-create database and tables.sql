@@ -1,7 +1,24 @@
--- 1-tables.sql
-CREATE DATABASE CarManagement_Final;
+-- create database and tables
+IF DB_ID('CarManagement_Final') IS NULL
+BEGIN
+    CREATE DATABASE CarManagement_Final;
+END
 GO
+
 USE CarManagement_Final;
+GO
+
+-- Drop tables in reverse order to avoid Foreign Key constraint errors
+DROP TABLE IF EXISTS AppUser;
+DROP TABLE IF EXISTS Payment;
+DROP TABLE IF EXISTS Repair;
+DROP TABLE IF EXISTS Sale;
+DROP TABLE IF EXISTS Reservation;
+DROP TABLE IF EXISTS Insurance;
+DROP TABLE IF EXISTS Car;
+DROP TABLE IF EXISTS Employee;
+DROP TABLE IF EXISTS Customer;
+DROP TABLE IF EXISTS Manufacturer;
 GO
 
 CREATE TABLE Manufacturer (
@@ -15,6 +32,7 @@ CREATE TABLE Customer (
     NationalCode NVARCHAR(10) NOT NULL UNIQUE,
     FirstName NVARCHAR(50) NOT NULL,
     LastName NVARCHAR(50) NOT NULL,
+    FullName AS (FirstName + ' ' + LastName),
     Phone NVARCHAR(20) NOT NULL UNIQUE,
     Address NVARCHAR(255),
     WalletBalance DECIMAL(18,2) DEFAULT 0.00,
@@ -26,6 +44,7 @@ CREATE TABLE Employee (
     NationalCode NVARCHAR(10) NOT NULL UNIQUE,
     FirstName NVARCHAR(50) NOT NULL,
     LastName NVARCHAR(50) NOT NULL,
+    FullName AS (FirstName + ' ' + LastName),
     Position NVARCHAR(50),
     BaseSalary DECIMAL(18,2),
     CommissionRate DECIMAL(5,2) DEFAULT 0.00
@@ -37,6 +56,7 @@ CREATE TABLE Car (
     ManufacturerID INT FOREIGN KEY REFERENCES Manufacturer(ManufacturerID),
     Model NVARCHAR(50) NOT NULL,
     BuildYear INT,
+    CarAge AS (YEAR(GETDATE()) - BuildYear),
     Color NVARCHAR(30),
     Mileage INT DEFAULT 0,
     DailyRentPrice DECIMAL(18,2) NOT NULL,
